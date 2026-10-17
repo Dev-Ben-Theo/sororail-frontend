@@ -95,3 +95,31 @@ describe("VestingClient.revoke (#33)", () => {
     prepareSpy.mockRestore();
   });
 });
+
+describe("VestingClient.claimable (#35)", () => {
+  it("simulates the claimable read and parses the returned amount as a bigint", async () => {
+    const amount = await client().claimable();
+
+    expect(typeof amount).toBe("bigint");
+    expect(amount).toBe(750n);
+  });
+
+  it("invokes the read path with method 'claimable' and no arguments", async () => {
+    const fake = client();
+    const readSpy = vi.spyOn(
+      fake as unknown as {
+        read: (
+          method: string,
+          args: unknown[],
+          parse: (value: unknown) => unknown,
+        ) => Promise<unknown>;
+      },
+      "read",
+    );
+
+    await fake.claimable();
+
+    expect(readSpy).toHaveBeenCalledWith("claimable", [], expect.any(Function));
+    readSpy.mockRestore();
+  });
+});
